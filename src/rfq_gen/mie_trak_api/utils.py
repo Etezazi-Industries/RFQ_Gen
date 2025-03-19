@@ -1,4 +1,5 @@
 import os
+import sys
 import pyodbc
 import functools
 from contextlib import closing
@@ -8,7 +9,17 @@ from pydantic import BaseModel, Field, conint, constr, confloat
 from dotenv import load_dotenv
 
 
-load_dotenv()
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+env_path = resource_path(".env")
+load_dotenv(env_path)
 
 DSN = os.getenv("SANDBOX")  # WARNING: Change this to live when compiling
 LOGGER = getlogger("MT Funcs")
