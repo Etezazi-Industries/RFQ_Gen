@@ -5,3 +5,7 @@ build/
 dist/
 src/rfq_gen/test_main.py
 .venv/
+.pytest_cache/
+Makefile
+RFQ_Gen.spec
+.env

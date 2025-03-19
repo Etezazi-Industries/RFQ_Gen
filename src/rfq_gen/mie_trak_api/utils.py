@@ -1,18 +1,17 @@
+import os
 import pyodbc
 import functools
 from contextlib import closing
 from base_logger import getlogger
 from typing import Optional, Annotated, Dict, Any, Callable, List
 from pydantic import BaseModel, Field, conint, constr, confloat
+from dotenv import load_dotenv
 
 
+load_dotenv()
+
+DSN = os.getenv("SANDBOX")  # WARNING: Change this to live when compiling
 LOGGER = getlogger("MT Funcs")
-_DSN_SANDBOX = (
-    "DRIVER={SQL Server};SERVER=ETZ-SQL;DATABASE=SANDBOX;Trusted_Connection=yes"
-)
-_DSN_LIVE = "DRIVER={SQL Server};SERVER=ETZ-SQL;DATABASE=ETEZAZIMIETrakLive;Trusted_Connection=yes"
-
-DSN = _DSN_SANDBOX
 
 
 def with_db_conn(commit: bool = False):

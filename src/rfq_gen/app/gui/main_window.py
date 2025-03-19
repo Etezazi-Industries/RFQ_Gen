@@ -1,18 +1,18 @@
 import os
 import datetime
 import re
+from pprint import pprint
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, simpledialog
 from tkcalendar import Calendar
 from threading import Thread
-from pprint import pprint
 from typing import Dict, Any
-from src import controller
-from src.gui.utils import center_window, gui_error_handler
+from app import controller
+from app.gui.utils import center_window, gui_error_handler
+from app.excel_parser import create_dict_from_excel_new, generate_item_pks
+from app.gui.cust_buyer_selection_gui import CustomerSelectionGUI
 from mie_trak_api import bom, item, party, request_for_quote, quote, router
 from base_logger import getlogger
-from src.excel_parser import create_dict_from_excel_new, generate_item_pks
-from src.gui.cust_buyer_selection_gui import CustomerSelectionGUI
 
 
 LOGGER = getlogger("Main")
@@ -477,6 +477,8 @@ class RfqGen(tk.Tk):
             messagebox.showerror("ERROR", "Edit Excel File and try Again")
             self.reset_gui()
             return
+
+        LOGGER.debug(info_dict)
 
         customer_rfq_number = self.rfq_number_text.get()  # user input
 

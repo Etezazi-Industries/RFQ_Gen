@@ -1,6 +1,5 @@
 import sys
 import loguru
-import os
 
 
 def getlogger(name: str = "DefaultName", level="DEBUG") -> loguru.logger:  # type: ignore

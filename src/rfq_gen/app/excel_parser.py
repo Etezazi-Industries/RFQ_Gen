@@ -109,7 +109,14 @@ def create_dict_from_excel_new(filepath: str) -> Dict[str, Dict[str, Any]]:
     my_dict = {}
 
     errors = []
+
     for idx, (_, row) in enumerate(df.iterrows(), start=1):
+
+        # check if line is blank.
+        if all([e == "" or not e or e == 0.0 for e in row]):
+            LOGGER.debug("Found blank. Breaking.")
+            break
+
         part_number = row["part_number"] or f"Tool-{idx}"  # Fallback naming
 
         try:

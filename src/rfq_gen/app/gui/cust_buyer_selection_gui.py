@@ -3,7 +3,7 @@ from tkinter import StringVar, Listbox, Scrollbar
 from tkinter import messagebox
 from typing import Callable, Dict
 from mie_trak_api import party
-from src.gui.utils import gui_error_handler, center_window
+from app.gui.utils import gui_error_handler, center_window
 from base_logger import getlogger
 
 
