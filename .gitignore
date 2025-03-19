@@ -1,0 +1,7 @@
+logs/
+MieTrakAPI.log
+**/__pycache__/
+build/
+dist/
+src/rfq_gen/test_main.py
+.venv/

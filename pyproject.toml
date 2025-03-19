@@ -1,0 +1,25 @@
+[project]
+name = "rfq-gen"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Siddharth Vyas",email = "sidd.vyass@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "pyodbc (>=5.2.0,<6.0.0)",
+    "tkcalendar (>=1.6.1,<2.0.0)",
+    "loguru (>=0.7.3,<0.8.0)",
+    "pydantic (>=2.10.6,<3.0.0)",
+    "pandas (>=2.2.3,<3.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "rfq_gen", from = "src"}]
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
