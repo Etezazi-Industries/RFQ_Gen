@@ -2,7 +2,6 @@ import pandas as pd
 import pytest
 from pprint import pprint
 from pathlib import Path
-
 from src.rfq_gen.app.excel_parser import create_dict_from_excel_new
 
 

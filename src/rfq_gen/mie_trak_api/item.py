@@ -1,4 +1,3 @@
-from typing import ValuesView
 from mie_trak_api.utils import with_db_conn, create_pydantic_model
 from base_logger import getlogger
 import pyodbc
