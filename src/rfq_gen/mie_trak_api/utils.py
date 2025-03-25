@@ -21,8 +21,11 @@ def resource_path(relative_path):
 env_path = resource_path(".env")
 load_dotenv(env_path)
 
-DSN = os.getenv("SANDBOX")  # WARNING: Change this to live when compiling
 LOGGER = getlogger("MT Funcs")
+
+conn_type = "LIVE"  # WARNING: Change this to live when compiling
+LOGGER.info(f"Database conn: {conn_type}")
+DSN = os.getenv(conn_type)  
 
 
 def with_db_conn(commit: bool = False):
