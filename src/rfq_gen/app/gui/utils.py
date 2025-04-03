@@ -49,12 +49,17 @@ def gui_error_handler(func):
 
 def center_window(window, width=1000, height=700):
     """
-    [TODO:description]
+    Centers a Tkinter window on the screen with the specified dimensions.
 
-    :param window [TODO:type]: [TODO:description]
-    :param width [TODO:type]: [TODO:description]
-    :param height [TODO:type]: [TODO:description]
+    Parameters:
+        window (Tk or Toplevel): The Tkinter window instance to be centered.
+        width (int): The desired width of the window in pixels (default is 1000).
+        height (int): The desired height of the window in pixels (default is 700).
+
+    The function calculates the center position based on the screen's dimensions and sets
+    the window geometry accordingly.
     """
+
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
 
@@ -66,11 +71,17 @@ def center_window(window, width=1000, height=700):
 
 def transfer_file_to_folder(folder_path: str, file_path: str) -> str:
     """
-    [TODO:description]
+    Copies a file to the specified folder and returns the new file path.
 
-    :param folder_path: [TODO:description]
-    :param file_path: [TODO:description]
-    :return: [TODO:description]
+    This function ensures that the destination folder exists, then copies the file
+    from the given source path to that folder, preserving the original filename.
+
+    Parameters:
+        folder_path (str): The path to the destination folder where the file should be copied.
+        file_path (str): The full path to the source file that will be copied.
+
+    Returns:
+        str: The full path to the copied file in the destination folder.
     """
 
     os.makedirs(folder_path, exist_ok=True)

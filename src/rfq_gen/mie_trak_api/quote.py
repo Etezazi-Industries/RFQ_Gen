@@ -4,6 +4,7 @@ from base_logger import getlogger
 
 
 LOGGER = getlogger("MT Quote")
+SOURCE_QUOTE = 49
 
 
 @with_db_conn(commit=True)
@@ -15,14 +16,23 @@ def create_quote_new(
     part_number: str,
 ):
     """
-    [TODO:description]
+    Inserts a new quote record into the database and returns its primary key.
 
-    :param cursor: [TODO:description]
-    :param customer_fk: [TODO:description]
-    :param item_fk: [TODO:description]
-    :param quote_type: [TODO:description]
-    :param part_number: [TODO:description]
-    :raises ValueError: [TODO:description]
+    This function creates a new entry in the 'Quote' table with the provided details.
+    After the insertion, it retrieves the primary key of the newly created quote record.
+
+    Parameters:
+        cursor (pyodbc.Cursor): The database cursor used for executing SQL commands.
+        customer_fk (int): The foreign key referencing the customer associated with the quote.
+        item_fk (int): The foreign key referencing the item associated with the quote.
+        quote_type (int): The type identifier for the quote.
+        part_number (str): The part number related to the quote.
+
+    Returns:
+        int: The primary key of the newly inserted quote.
+
+    Raises:
+        ValueError: If the database fails to return the primary key for the newly inserted quote.
     """
     query = """
         INSERT INTO Quote (CustomerFK, ItemFK, QuoteType, PartNumber, DivisionFK) 
@@ -39,13 +49,22 @@ def create_quote_new(
 
 
 @with_db_conn(commit=True)
-def copy_operations_to_quote(cursor: pyodbc.Cursor, new_quote_fk, source_quote_fk=494):
+def copy_operations_to_quote(
+    cursor: pyodbc.Cursor, new_quote_fk, source_quote_fk=SOURCE_QUOTE
+):
     """
-    [TODO:description]
+    Copies operations from one quote to another in the QuoteAssembly table.
 
-    :param cursor: [TODO:description]
-    :param new_quote_fk [TODO:type]: [TODO:description]
-    :param source_quote_fk [TODO:type]: [TODO:description]
+    This function duplicates selected columns from the QuoteAssembly records associated
+    with the source quote and inserts them for the new quote. Certain columns and the BOM are excluded
+    from the copy.
+
+    Parameters:
+        cursor (pyodbc.Cursor): The database cursor used to execute SQL queries.
+        new_quote_fk (int): The foreign key of the new quote to which operations will be copied.
+        source_quote_fk (int, optional): The foreign key of the quote from which operations
+            will be copied. Defaults to the constant SOURCE_QUOTE.
+
     """
 
     all_columns = get_table_schema("QuoteAssembly")
@@ -68,7 +87,8 @@ def copy_operations_to_quote(cursor: pyodbc.Cursor, new_quote_fk, source_quote_f
         INSERT INTO QuoteAssembly ({column_names}, QuoteFK)
         SELECT {column_names}, ?
         FROM QuoteAssembly
-        WHERE QuoteFK = ?;
+        WHERE QuoteFK = ?
+        AND NOT (UnitOfMeasureSetFK = 1 AND CalculationTypeFK = 17);
     """
 
     cursor.execute(query, (new_quote_fk, source_quote_fk))
@@ -77,6 +97,24 @@ def copy_operations_to_quote(cursor: pyodbc.Cursor, new_quote_fk, source_quote_f
 
 @with_db_conn()
 def get_operation_quote_template(cursor: pyodbc.Cursor, quote_fk: int = 494):
+    """
+    Retrieves operation data for a given quote, excluding certain metadata columns.
+
+    This function fetches the values of selected columns from the QuoteAssembly table
+    for a specified quote. Certain columns such as primary keys and parent references
+    are excluded from the results. The function returns both the list of included
+    column names and the corresponding row values.
+
+    Parameters:
+        cursor (pyodbc.Cursor): The database cursor used to execute SQL queries.
+        quote_fk (int, optional): The foreign key of the quote whose operations are to be retrieved.
+            Defaults to 494.
+
+    Returns:
+        tuple[list[str], list[tuple]]: A tuple containing:
+            - A list of column names included in the result.
+            - A list of row tuples representing the data for each operation.
+    """
     all_columns = get_table_schema("QuoteAssembly")
     excluded_columns = [
         "QuoteFK",
@@ -103,11 +141,23 @@ def get_operation_quote_template(cursor: pyodbc.Cursor, quote_fk: int = 494):
 @with_db_conn()
 def get_quote_assembly_pk(cursor: pyodbc.Cursor, **quote_details) -> int | None:
     """
-    [TODO:description]
+    Retrieves the primary key of a QuoteAssembly record that matches the provided conditions.
 
-    :param cursor: [TODO:description]
-    :return: [TODO:description]
-    :raises ValueError: [TODO:description]
+    This function builds a dynamic SQL query using the keyword arguments passed in
+    `quote_details` to filter records in the QuoteAssembly table. It returns the primary key
+    (QuoteAssemblyPK) of the first matching record, or None if no match is found.
+
+    Parameters:
+        cursor (pyodbc.Cursor): The database cursor used to execute SQL queries.
+        **quote_details: Arbitrary keyword arguments representing column-value pairs
+            to use as filter conditions in the WHERE clause.
+
+    Returns:
+        int | None: The primary key (QuoteAssemblyPK) of the matching record, or None
+        if no match is found.
+
+    Raises:
+        ValueError: If no filter conditions are provided.
     """
     if not quote_details:
         raise ValueError("At least one condition must be provided to get an item.")
@@ -126,10 +176,16 @@ def get_quote_assembly_pk(cursor: pyodbc.Cursor, **quote_details) -> int | None:
 @with_db_conn(commit=True)
 def create_quote_assembly_formula_variable(cursor: pyodbc.Cursor, quote_pk):
     """
-    [TODO:description]
+    Inserts formula variable records for all operations associated with a given quote.
 
-    :param self [TODO:type]: [TODO:description]
-    :param quote_pk [TODO:type]: [TODO:description]
+    This function populates the QuoteAssemblyFormulaVariable table with data derived from
+    the QuoteAssembly table for the specified quote. It inserts both setup and run time
+    variables for each operation where an OperationFK is present.
+
+    Parameters:
+        cursor (pyodbc.Cursor): The database cursor used to execute SQL queries.
+        quote_pk (int): The primary key of the quote whose operations are being used
+            to populate formula variables.
     """
     query = """
         INSERT INTO QuoteAssemblyFormulaVariable
