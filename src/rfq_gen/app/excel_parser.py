@@ -111,7 +111,6 @@ def create_dict_from_excel_new(filepath: str) -> Dict[str, Dict[str, Any]]:
     errors = []
 
     for idx, (_, row) in enumerate(df.iterrows(), start=1):
-
         # check if line is blank.
         if all([e == "" or not e or e == 0.0 for e in row]):
             LOGGER.debug("Found blank. Breaking.")
@@ -184,31 +183,21 @@ def generate_item_pks(info_dict: Dict[str, Dict[str, Any]]) -> Dict[str, tuple]:
 
         # Fetch or create material PK
         if value_dict.get("material"):
-            mat_pk = item.get_item(
+            mat_pk = item.get_or_create_item(
                 **{
-                    "PartNumber": value_dict.get("part_number"),
-                    "StockLength": value_dict.get("stock_length"),
-                    "StockWidth": value_dict.get("stock_width"),
-                    "Thickness": value_dict.get("thickness"),
+                    "PartNumber": value_dict.get("material"),
+                    "ServiceItem": 0,
+                    "Purchase": 1,
+                    "Manufactureditem": 0,
+                    "ItemTypeFK": 2,
+                    "BulkShip": 0,
+                    "ShipLoose": 0,
+                    "CertificationsRequiredBySupplier": 1,
+                    "PurchaseGeneralLedgerAccountFK": 127,
+                    "SalesCogsAccountFK": 127,
+                    "CalculationTypeFK": 4,
                 }
             )
-            if not mat_pk:
-                mat_pk = item.get_or_create_item(
-                    **{
-                        "PartNumber": value_dict.get("part_number"),
-                        "ServiceItem": 0,
-                        "Purchase": 1,
-                        "Manufactureditem": 0,
-                        "ItemTypeFK": 2,
-                        "OnlyCreate": 1,
-                        "BulkShip": 0,
-                        "ShipLoose": 0,
-                        "CertReqdBySupplier": 1,
-                        "PurchaseAccountFK": 127,
-                        "CogsAccFK": 127,
-                        "CalculationTypeFK": 4,
-                    }
-                )
 
         # Fetch or create finish PK
         if value_dict.get("finish_code"):
@@ -226,12 +215,11 @@ def generate_item_pks(info_dict: Dict[str, Dict[str, Any]]) -> Dict[str, tuple]:
                     "Comment": comment,
                     "PurchaseOrderComment": comment,
                     "Inventoriable": 0,
-                    "OnlyCreate": 1,
-                    "CertReqdBySupplier": 1,
+                    "CertificationsRequiredBySupplier": 1,
                     "CanNotCreateWorkOrder": 1,
                     "CanNotInvoice": 1,
-                    "PurchaseAccountFK": 125,
-                    "CogsAccFK": 125,
+                    "PurchaseGeneralLedgerAccountFK": 127,
+                    "SalesCogsAccountFK": 127,
                     "CalculationTypeFK": 17,
                 }
             )
@@ -253,12 +241,11 @@ def generate_item_pks(info_dict: Dict[str, Dict[str, Any]]) -> Dict[str, tuple]:
                     "Comment": comment,
                     "PurchaseOrderComment": comment,
                     "Inventoriable": 0,
-                    "OnlyCreate": 1,
-                    "CertReqdBySupplier": 1,
+                    "CertificationsRequiredBySupplier": 1,
                     "CanNotCreateWorkOrder": 1,
                     "CanNotInvoice": 1,
-                    "PurchaseAccountFK": 125,
-                    "CogsAccFK": 125,
+                    "PurchaseGeneralLedgerAccountFK": 125,
+                    "SalesCogsAccountFK": 125,
                     "CalculationTypeFK": 17,
                 }
             )

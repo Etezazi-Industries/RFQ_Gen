@@ -20,12 +20,14 @@ def get_or_create_item(cursor: pyodbc.Cursor, **item_data):
     """
 
     part_number = item_data.get("PartNumber", "")
-    cursor.execute("SELECT ItemPK FROM Item WHERE PartNumber = ?", (part_number,))
-    result = cursor.fetchone()
+    # cursor.execute("SELECT ItemPK FROM Item WHERE PartNumber = ?", (part_number,))
+    # result = cursor.fetchone()
+
+    result = get_item(cursor, **item_data)  # more accurate
 
     if result:
-        LOGGER.info(f"PartNumber: {part_number} found. (PK: {result[0]})")
-        return result[0]
+        LOGGER.info(f"PartNumber: {part_number} found. (PK: {result})")
+        return result
 
     validated_data = item_model(**item_data).model_dump(exclude_unset=True)
 
@@ -58,7 +60,7 @@ def get_or_create_item(cursor: pyodbc.Cursor, **item_data):
         )
 
 
-@with_db_conn()
+# @with_db_conn()
 def get_item(cursor: pyodbc.Cursor, **item_data) -> int | None:
     """
     [TODO:description]
@@ -72,6 +74,7 @@ def get_item(cursor: pyodbc.Cursor, **item_data) -> int | None:
 
     where_conditions = " AND ".join([f"{key} = ?" for key in item_data.keys()])
     query = f"SELECT ItemPK FROM Item WHERE {where_conditions};"
+    LOGGER.debug(query)
 
     values = tuple(item_data.values())
 

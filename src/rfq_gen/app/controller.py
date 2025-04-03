@@ -123,11 +123,11 @@ def create_finish_router(finish_description: str, item_fin_pk: int, part_num: st
                     ],  # TODO: Fix this as its crossing the limit, add this to the comments.
                     "Inventoriable": 0,
                     "ItemTypeFK": 5,
-                    "CertReqdBySupplier": 1,
+                    "CertificationsRequiredBySupplier": 1,
                     "CanNotCreateWorkOrder": 1,
                     "CanNotInvoice": 1,
-                    "PurchaseAccountFK": 125,
-                    "CogsAccFk": 125,
+                    "PurchaseGeneralLedgerAccountFK": 125,
+                    "SalesCogsAccountFK": 125,
                     "CalculationTypeFK": 17,
                     "Comment": code,
                 }
