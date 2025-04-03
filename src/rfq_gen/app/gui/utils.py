@@ -20,10 +20,14 @@ def gui_error_handler(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
+        self = args[0]
         while True:
             try:
                 return func(*args, **kwargs)
             except RuntimeError as e:  # Catching RuntimeError from `with_db_conn`
+                if hasattr(self, "loading_screen") and self.loading_screen:
+                    self.loading_screen.after(0, self.loading_screen.destroy)
+
                 retry = messagebox.askretrycancel(
                     title="Database Error",
                     message=f"{e}\n\nWould you like to retry?",
@@ -31,6 +35,9 @@ def gui_error_handler(func):
                 if not retry:
                     return None  # Exit function on cancel
             except Exception as e:
+                if hasattr(self, "loading_screen") and self.loading_screen:
+                    self.loading_screen.after(0, self.loading_screen.destroy)
+
                 messagebox.showerror(
                     title="Unexpected Error",
                     message=f"An unexpected error occurred:\n\n{e}",

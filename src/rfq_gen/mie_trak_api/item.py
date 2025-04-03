@@ -20,10 +20,8 @@ def get_or_create_item(cursor: pyodbc.Cursor, **item_data):
     """
 
     part_number = item_data.get("PartNumber", "")
-    # cursor.execute("SELECT ItemPK FROM Item WHERE PartNumber = ?", (part_number,))
-    # result = cursor.fetchone()
 
-    result = get_item(cursor, **item_data)  # more accurate
+    result = get_item(cursor, **item_data)  # more accurate search
 
     if result:
         LOGGER.info(f"PartNumber: {part_number} found. (PK: {result})")
@@ -60,7 +58,6 @@ def get_or_create_item(cursor: pyodbc.Cursor, **item_data):
         )
 
 
-# @with_db_conn()
 def get_item(cursor: pyodbc.Cursor, **item_data) -> int | None:
     """
     [TODO:description]
