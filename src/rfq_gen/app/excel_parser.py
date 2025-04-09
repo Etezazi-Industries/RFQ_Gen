@@ -142,6 +142,23 @@ def create_dict_from_excel_new(filepath: str) -> Dict[str, Dict[str, Any]]:
             f"Main Part number missing from excel sheet. Check Assy for column."
         )
 
+    existing_parts = {data["part_number"] for data in my_dict.values()}
+    assy_errors = []
+    for _, data in my_dict.items():
+        assy_for = data.get("assy_for", "").strip()
+        if assy_for:
+            if assy_for == data["part_number"]:
+                assy_errors.append(
+                    f"Part number '{data['part_number']}' cannot reference itself in the 'assy_for' column."
+                )
+            elif assy_for not in existing_parts:
+                assy_errors.append(
+                    f"Part number '{data['part_number']}' has an 'assy_for' value '{assy_for}' that does not match any part numbers in the Excel sheet."
+                )
+    if assy_errors:
+        LOGGER.error("\n".join(assy_errors))
+        raise ValueError("\n".join(assy_errors))
+
     LOGGER.info("Excel File extracted successfully.")
 
     return my_dict
